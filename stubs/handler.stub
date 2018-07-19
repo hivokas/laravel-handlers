@@ -1,0 +1,14 @@
+<?php
+
+namespace DummyNamespace;
+
+use Illuminate\Http\Request;
+use Hivokas\LaravelHandlers\Handler;
+
+class DummyClass extends Handler
+{
+    public function __invoke()
+    {
+        //
+    }
+}
