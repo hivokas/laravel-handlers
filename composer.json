@@ -17,5 +17,12 @@
         "psr-4": {
             "Hivokas\\LaravelHandlers\\": "src/"
         }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Hivokas\\LaravelHandlers\\Providers\\HandlersServiceProvider"
+            ]
+        }
     }
 }
