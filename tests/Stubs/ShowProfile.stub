@@ -1,0 +1,14 @@
+<?php
+
+namespace App\Http\Handlers;
+
+use Illuminate\Http\Request;
+use Hivokas\LaravelHandlers\Handler;
+
+class ShowProfile extends Handler
+{
+    public function __invoke()
+    {
+        //
+    }
+}
