@@ -22,6 +22,11 @@
             "Hivokas\\LaravelHandlers\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Hivokas\\LaravelHandlers\\Tests\\": "tests/"
+        }
+    },
     "scripts": {
         "test": "vendor/bin/phpunit --colors=always"
     },
