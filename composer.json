@@ -1,6 +1,6 @@
 {
     "name": "hivokas/laravel-handlers",
-    "description": "Handlers implementation for Laravel",
+    "description": "Request Handlers for Laravel Framework",
     "keywords": ["laravel", "handlers", "handler", "single", "action"],
     "type": "library",
     "license": "MIT",
