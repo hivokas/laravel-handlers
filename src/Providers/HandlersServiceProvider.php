@@ -2,8 +2,8 @@
 
 namespace Hivokas\LaravelHandlers\Providers;
 
-use Hivokas\LaravelHandlers\Commands\HandlerMakeCommand;
 use Illuminate\Support\ServiceProvider;
+use Hivokas\LaravelHandlers\Commands\HandlerMakeCommand;
 
 class HandlersServiceProvider extends ServiceProvider
 {
