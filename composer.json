@@ -13,11 +13,16 @@
     "require": {
         "php": ">=7.1"
     },
+    "require-dev": {
+        "mockery/mockery": "^1.1",
+        "orchestra/testbench": "~3.0"
+    },
     "autoload": {
         "psr-4": {
             "Hivokas\\LaravelHandlers\\": "src/"
         }
     },
+
     "extra": {
         "laravel": {
             "providers": [
