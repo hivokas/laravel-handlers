@@ -2,11 +2,11 @@
 
 namespace Hivokas\LaravelHandlers\Commands;
 
-use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Collection;
 use Illuminate\Filesystem\Filesystem;
-use Symfony\Component\Console\Input\InputArgument;
+use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\InputArgument;
 
 class HandlerMakeCommand extends GeneratorCommand
 {
@@ -68,8 +68,8 @@ class HandlerMakeCommand extends GeneratorCommand
 
         $this->getGeneratedClassNames()
             ->each(function (string $className) use ($finalNamespace) {
-                $this->nameInput = $finalNamespace . '\\' . $className;
-                $this->type = $className . ' handler';
+                $this->nameInput = $finalNamespace.'\\'.$className;
+                $this->type = $className.' handler';
 
                 parent::handle();
             });
@@ -84,14 +84,14 @@ class HandlerMakeCommand extends GeneratorCommand
      */
     protected function getFinalNamespace(): string
     {
-        $defaultNamespace = $this->laravel->getNamespace() . 'Http\\Handlers';
+        $defaultNamespace = $this->laravel->getNamespace().'Http\\Handlers';
 
         if (! is_null($namespaceOption = $this->getValidatedAndNormalizedNamespaceOption())) {
             if (starts_with($namespaceOption, '\\')) {
                 return $namespaceOption;
             }
 
-            return $defaultNamespace . '\\' . $namespaceOption;
+            return $defaultNamespace.'\\'.$namespaceOption;
         }
 
         return $defaultNamespace;
@@ -113,7 +113,7 @@ class HandlerMakeCommand extends GeneratorCommand
         $namespaceWithNormalizedSlashes = preg_replace('/[\/\\\]+/', '\\', $namespace);
 
         if (! preg_match('/^(\\\|(\\\?\w+)+)$/', $namespaceWithNormalizedSlashes)) {
-            $this->error('[' . $namespace . '] is not a valid namespace.');
+            $this->error('['.$namespace.'] is not a valid namespace.');
             exit;
         }
 
@@ -140,7 +140,7 @@ class HandlerMakeCommand extends GeneratorCommand
             return collect([$name]);
         } else {
             return $this->actions->map(function (string $action) use ($name) {
-                return studly_case($action) . $name;
+                return studly_case($action).$name;
             });
         }
     }
@@ -267,7 +267,7 @@ class HandlerMakeCommand extends GeneratorCommand
     protected function getValidatedAndNormalizedActionName(string $action): string
     {
         if (! preg_match('/^\w+$/', $action)) {
-            $this->error('[' . $action . '] is not a valid action name.');
+            $this->error('['.$action.'] is not a valid action name.');
             exit;
         }
 
@@ -291,7 +291,7 @@ class HandlerMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return __DIR__ . '/../../stubs/handler.stub';
+        return __DIR__.'/../../stubs/handler.stub';
     }
 
     /**

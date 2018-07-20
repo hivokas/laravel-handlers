@@ -178,7 +178,7 @@ class HandlerMakeCommandTest extends AbstractTestCase
         ]);
 
         $generatedContent = file_get_contents($this->app->path('Http/Handlers/ShowProfile.php'));
-        $expectedContent = file_get_contents(__DIR__ . '/Stubs/ShowProfile.stub');
+        $expectedContent = file_get_contents(__DIR__.'/Stubs/ShowProfile.stub');
 
         $this->assertEquals($generatedContent, $expectedContent);
     }
@@ -193,7 +193,7 @@ class HandlerMakeCommandTest extends AbstractTestCase
     protected function getHandlerFileNamesByNameAndActions(string $name, array $actions): array
     {
         return array_map(function (string $action) use ($name) {
-            return studly_case($action) . studly_case($name) . '.php';
+            return studly_case($action).studly_case($name).'.php';
         }, $actions);
     }
 
