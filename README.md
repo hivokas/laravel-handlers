@@ -69,7 +69,7 @@ php artisan make:handler Post --resource --except=index,show,edit
 - Specify namespace for handlers creating (relative path)
 
 ```bash
-php artisan make:handler --resource --namespace=Post
+php artisan make:handler Post --resource --namespace=Post
 ```
 
 > `IndexPost`, `ShowPost`, `CreatePost`, `StorePost`, `EditPost`, `UpdatePost`, `DestroyPost` handlers will be created under `App\Http\Handlers\Post` namespace in `app/Http/Handlers/Post` directory
