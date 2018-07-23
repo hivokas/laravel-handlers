@@ -26,6 +26,8 @@ The package will automatically register itself.
 
 ## Creation of request handlers
 
+![Showcase](showcase.svg)
+
 - Create a handler
 
 ```bash

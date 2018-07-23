@@ -104,9 +104,9 @@ class HandlerMakeCommand extends GeneratorCommand
      */
     protected function getValidatedAndNormalizedNamespaceOption(): ?string
     {
-        $namespace = $this->option('namespace');
+        $namespace = (string) $this->option('namespace');
 
-        if (is_null($namespace)) {
+        if (! $namespace) {
             return null;
         }
 
@@ -152,7 +152,7 @@ class HandlerMakeCommand extends GeneratorCommand
      */
     protected function getValidatedNameArgument(): string
     {
-        $name = $this->argument('name');
+        $name = (string) $this->argument('name');
         if (! preg_match('/^\w+$/', $name)) {
             $this->error('Name can\'t contain any non-word characters.');
             exit;
@@ -185,8 +185,8 @@ class HandlerMakeCommand extends GeneratorCommand
      */
     protected function processActionsOption(): self
     {
-        if ($this->option('actions')) {
-            collect(explode(',', $this->option('actions')))
+        if ($actions = (string) $this->option('actions')) {
+            collect(explode(',', $actions))
                 ->each(function (string $action) {
                     $this->addActionIfNotExists(
                         $this->getValidatedAndNormalizedActionName($action)
@@ -204,8 +204,8 @@ class HandlerMakeCommand extends GeneratorCommand
      */
     protected function processExceptOption(): self
     {
-        if ($this->option('except')) {
-            collect(explode(',', $this->option('except')))
+        if ($except = (string) $this->option('except')) {
+            collect(explode(',', $except))
                 ->each(function (string $action) {
                     $this->deleteActionIfExists(
                         $this->getValidatedAndNormalizedActionName($action)
