@@ -3,7 +3,7 @@
 namespace DummyNamespace;
 
 use Illuminate\Http\Request;
-use Hivokas\LaravelHandlers\Handler;
+use DummyBaseHandlerNamespace as Handler;
 
 class DummyClass extends Handler
 {

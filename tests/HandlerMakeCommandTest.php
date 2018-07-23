@@ -2,6 +2,7 @@
 
 namespace Hivokas\LaravelHandlers\Tests;
 
+use Illuminate\Routing\Controller;
 use SplFileInfo;
 use Symfony\Component\Console\Exception\RuntimeException;
 
@@ -179,6 +180,22 @@ class HandlerMakeCommandTest extends AbstractTestCase
 
         $generatedContent = file_get_contents($this->app->path('Http/Handlers/ShowProfile.php'));
         $expectedContent = file_get_contents(__DIR__.'/Stubs/ShowProfile.stub');
+
+        $this->assertEquals($generatedContent, $expectedContent);
+    }
+
+    public function test_proper_file_content_generation_with_custom_base_handler()
+    {
+        config([
+            'handlers.base' => Controller::class
+        ]);
+
+        $this->artisan('make:handler', [
+            'name' => 'ShowProfile',
+        ]);
+
+        $generatedContent = file_get_contents($this->app->path('Http/Handlers/ShowProfile.php'));
+        $expectedContent = file_get_contents(__DIR__.'/Stubs/ShowProfileWithCustomBaseHandler.stub');
 
         $this->assertEquals($generatedContent, $expectedContent);
     }

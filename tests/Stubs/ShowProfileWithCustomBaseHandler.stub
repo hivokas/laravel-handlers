@@ -3,7 +3,7 @@
 namespace App\Http\Handlers;
 
 use Illuminate\Http\Request;
-use Hivokas\LaravelHandlers\Handler as Handler;
+use Illuminate\Routing\Controller as Handler;
 
 class ShowProfile extends Handler
 {

@@ -294,6 +294,40 @@ class HandlerMakeCommand extends GeneratorCommand
         return __DIR__.'/../../stubs/handler.stub';
     }
 
+    /*
+     * Get the class name of the base handler.
+     *
+     * @return string
+     */
+    protected function getBaseHandlerClassName(): string
+    {
+        if (class_exists($base = config('handlers.base')))
+        {
+            return $base;
+        }
+
+        $this->error('The [' . $base . '] class specified as the base handler doesn\'t exist.');
+        exit;
+    }
+
+    /**
+     * Replace the namespace for the given stub.
+     *
+     * @param  string  $stub
+     * @param  string  $name
+     * @return $this
+     */
+    protected function replaceNamespace(&$stub, $name)
+    {
+        $stub = str_replace(
+            ['DummyNamespace', 'DummyBaseHandlerNamespace'],
+            [$this->getNamespace($name), $this->getBaseHandlerClassName(), config('auth.providers.users.model')],
+            $stub
+        );
+
+        return $this;
+    }
+
     /**
      * Get the console command arguments.
      *
