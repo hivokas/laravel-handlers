@@ -23,7 +23,6 @@ class ActionsBagTest extends AbstractTestCase
 
     public function test_delete_if_exists_method()
     {
-
         $bag = new ActionsBag;
 
         $bag->addIfNotExists('index');

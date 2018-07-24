@@ -2,12 +2,12 @@
 
 namespace Hivokas\LaravelHandlers\Commands;
 
-use Hivokas\LaravelHandlers\Exceptions\CommandException;
-use Hivokas\LaravelHandlers\Support\ActionsBag;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Console\GeneratorCommand;
+use Hivokas\LaravelHandlers\Support\ActionsBag;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
+use Hivokas\LaravelHandlers\Exceptions\CommandException;
 
 class HandlerMakeCommand extends GeneratorCommand
 {
@@ -69,8 +69,8 @@ class HandlerMakeCommand extends GeneratorCommand
             $finalNamespace = $this->getFinalNamespace();
 
             foreach ($classNames as $className) {
-                $this->nameInput = $finalNamespace . '\\' . $className;
-                $this->type = $className . ' handler';
+                $this->nameInput = $finalNamespace.'\\'.$className;
+                $this->type = $className.' handler';
 
                 parent::handle();
             }
@@ -273,12 +273,11 @@ class HandlerMakeCommand extends GeneratorCommand
      */
     protected function getBaseHandlerClassName(): string
     {
-        if (class_exists($base = config('handlers.base')))
-        {
+        if (class_exists($base = config('handlers.base'))) {
             return $base;
         }
 
-        throw new CommandException('The [' . $base . '] class specified as the base handler doesn\'t exist.');
+        throw new CommandException('The ['.$base.'] class specified as the base handler doesn\'t exist.');
     }
 
     /**
