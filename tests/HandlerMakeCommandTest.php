@@ -2,9 +2,9 @@
 
 namespace Hivokas\LaravelHandlers\Tests;
 
+use SplFileInfo;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Artisan;
-use SplFileInfo;
 use Symfony\Component\Console\Exception\RuntimeException;
 
 class HandlerMakeCommandTest extends AbstractTestCase
@@ -44,7 +44,7 @@ class HandlerMakeCommandTest extends AbstractTestCase
 
         $this->assertDirectoryNotExists($this->app->path('Handlers'));
 
-        $this->assertEquals(Artisan::output(), 'Name can\'t contain any non-word characters.' . PHP_EOL);
+        $this->assertEquals(Artisan::output(), 'Name can\'t contain any non-word characters.'.PHP_EOL);
     }
 
     public function test_create_existent_handler_without_force_option()
@@ -62,7 +62,7 @@ class HandlerMakeCommandTest extends AbstractTestCase
 
         $this->assertEquals($initialHandlerContent, file_get_contents($filePath));
 
-        $this->assertEquals(Artisan::output(), 'ShowProfile handler already exists!' . PHP_EOL);
+        $this->assertEquals(Artisan::output(), 'ShowProfile handler already exists!'.PHP_EOL);
     }
 
     public function test_create_existent_handler_with_force_option()
@@ -113,10 +113,9 @@ class HandlerMakeCommandTest extends AbstractTestCase
             '--namespace' => 'InvalidNamespace%',
         ]);
 
-
         $this->assertDirectoryNotExists($this->app->path('Handlers'));
 
-        $this->assertEquals(Artisan::output(), '[InvalidNamespace%] is not a valid namespace.' . PHP_EOL);
+        $this->assertEquals(Artisan::output(), '[InvalidNamespace%] is not a valid namespace.'.PHP_EOL);
     }
 
     public function test_resource_option()
@@ -186,7 +185,7 @@ class HandlerMakeCommandTest extends AbstractTestCase
 
         $this->assertDirectoryNotExists($this->app->path('Handlers'));
 
-        $this->assertEquals(Artisan::output(), '[destroy%] is not a valid action name.' . PHP_EOL);
+        $this->assertEquals(Artisan::output(), '[destroy%] is not a valid action name.'.PHP_EOL);
     }
 
     public function test_except_option()
@@ -221,7 +220,7 @@ class HandlerMakeCommandTest extends AbstractTestCase
 
         $this->assertDirectoryNotExists($this->app->path('Handlers'));
 
-        $this->assertEquals(Artisan::output(), '[destroy%] is not a valid action name.' . PHP_EOL);
+        $this->assertEquals(Artisan::output(), '[destroy%] is not a valid action name.'.PHP_EOL);
     }
 
     public function test_proper_file_content_generation()
@@ -239,7 +238,7 @@ class HandlerMakeCommandTest extends AbstractTestCase
     public function test_proper_file_content_generation_with_custom_base_handler()
     {
         config([
-            'handlers.base' => Controller::class
+            'handlers.base' => Controller::class,
         ]);
 
         $this->artisan('make:handler', [
