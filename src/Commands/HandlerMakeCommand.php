@@ -2,7 +2,7 @@
 
 namespace Hivokas\LaravelHandlers\Commands;
 
-use Illuminate\Support\Collection;
+use Hivokas\LaravelHandlers\Support\ActionsBag;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
@@ -25,13 +25,6 @@ class HandlerMakeCommand extends GeneratorCommand
     protected $description = 'Handler generator.';
 
     /**
-     * The collection of actions.
-     *
-     * @var Collection
-     */
-    protected $actions;
-
-    /**
      * The type of class being generated.
      *
      * @var string
@@ -52,27 +45,42 @@ class HandlerMakeCommand extends GeneratorCommand
      */
     public function __construct(Filesystem $files)
     {
-        $this->actions = collect();
-
         parent::__construct($files);
     }
 
     /**
      * Execute the console command.
      *
-     * @return bool|null
+     * @return bool
      */
-    public function handle()
+    public function handle(): bool
     {
-        $finalNamespace = $this->getFinalNamespace();
+        $bag = new ActionsBag;
 
-        $this->getGeneratedClassNames()
-            ->each(function (string $className) use ($finalNamespace) {
-                $this->nameInput = $finalNamespace.'\\'.$className;
-                $this->type = $className.' handler';
+        if (! $this->processResourceOption($bag) ||
+            ! $this->processActionsOption($bag) ||
+            ! $this->processExceptOption($bag) ||
+            ! $this->processApiOption($bag)) {
+            return false;
+        }
 
-                parent::handle();
-            });
+        if (($name = $this->getValidatedNameArgument()) === false) {
+            return false;
+        } else {
+            $classNames = $this->generateClassNames($bag, $name);
+        }
+
+        if (($finalNamespace = $this->getFinalNamespace()) === false) {
+            return false;
+        }
+
+
+        foreach ($classNames as $className) {
+            $this->nameInput = $finalNamespace . '\\' . $className;
+            $this->type = $className . ' handler';
+
+            parent::handle();
+        }
 
         return true;
     }
@@ -80,13 +88,15 @@ class HandlerMakeCommand extends GeneratorCommand
     /**
      * Get final namespace determined by default and specified by user namespaces.
      *
-     * @return string
+     * @return string|false
      */
-    protected function getFinalNamespace(): string
+    protected function getFinalNamespace()
     {
         $defaultNamespace = $this->laravel->getNamespace().'Http\\Handlers';
 
-        if (! is_null($namespaceOption = $this->getValidatedAndNormalizedNamespaceOption())) {
+        if (($namespaceOption = $this->getValidatedAndNormalizedNamespaceOption()) === false) {
+            return false;
+        } elseif (! is_null($namespaceOption)) {
             if (starts_with($namespaceOption, '\\')) {
                 return $namespaceOption;
             }
@@ -100,9 +110,9 @@ class HandlerMakeCommand extends GeneratorCommand
     /**
      * Get validated and normalized namespace option.
      *
-     * @return string|null
+     * @return string|false|null
      */
-    protected function getValidatedAndNormalizedNamespaceOption(): ?string
+    protected function getValidatedAndNormalizedNamespaceOption()
     {
         $namespace = (string) $this->option('namespace');
 
@@ -114,48 +124,45 @@ class HandlerMakeCommand extends GeneratorCommand
 
         if (! preg_match('/^(\\\|(\\\?\w+)+)$/', $namespaceWithNormalizedSlashes)) {
             $this->error('['.$namespace.'] is not a valid namespace.');
-            exit;
+
+            return false;
         }
 
         return $namespaceWithNormalizedSlashes;
     }
 
     /**
-     * Get class names generated from specified name and actions.
+     * Generate class names by specified name and actions.
      *
-     * @return Collection
+     * @param ActionsBag $bag
+     * @param string $name
+     * @return array
      */
-    protected function getGeneratedClassNames(): Collection
+    protected function generateClassNames(ActionsBag $bag, string $name): array
     {
-        $this->actions = collect();
+        $name = studly_case($name);
 
-        $this->processResourceOption()
-            ->processActionsOption()
-            ->processExceptOption()
-            ->processApiOption();
-
-        $name = studly_case($this->getValidatedNameArgument());
-
-        if ($this->actions->isEmpty()) {
-            return collect([$name]);
+        if ($bag->isEmpty()) {
+            return [$name];
         } else {
-            return $this->actions->map(function (string $action) use ($name) {
+            return array_map(function (string $action) use ($name) {
                 return studly_case($action).$name;
-            });
+            }, $bag->get());
         }
     }
 
     /**
      * Get validated name argument.
      *
-     * @return string
+     * @return string|false
      */
-    protected function getValidatedNameArgument(): string
+    protected function getValidatedNameArgument()
     {
         $name = (string) $this->argument('name');
         if (! preg_match('/^\w+$/', $name)) {
             $this->error('Name can\'t contain any non-word characters.');
-            exit;
+
+            return false;
         }
 
         return $name;
@@ -164,114 +171,98 @@ class HandlerMakeCommand extends GeneratorCommand
     /**
      * Process --resource option.
      *
-     * @return HandlerMakeCommand
+     * @param ActionsBag $bag
+     * @return bool
      */
-    protected function processResourceOption(): self
+    protected function processResourceOption(ActionsBag $bag): bool
     {
         if ($this->option('resource')) {
-            collect(['index', 'show', 'create', 'store', 'edit', 'update', 'destroy'])
-                ->each(function (string $resourceAction) {
-                    $this->addActionIfNotExists($resourceAction);
-                });
+            foreach (['index', 'show', 'create', 'store', 'edit', 'update', 'destroy'] as $action) {
+                $bag->addIfNotExists($action);
+            }
         }
 
-        return $this;
+        return true;
     }
 
     /**
      * Process --actions option.
      *
-     * @return HandlerMakeCommand
+     * @param ActionsBag $bag
+     * @return bool
      */
-    protected function processActionsOption(): self
+    protected function processActionsOption(ActionsBag $bag): bool
     {
         if ($actions = (string) $this->option('actions')) {
-            collect(explode(',', $actions))
-                ->each(function (string $action) {
-                    $this->addActionIfNotExists(
-                        $this->getValidatedAndNormalizedActionName($action)
-                    );
-                });
+            foreach (explode(',', $actions) as $action) {
+                if (($normalizedActionName = $this->getValidatedAndNormalizedActionName($action)) !== false) {
+                    $bag->addIfNotExists($normalizedActionName);
+
+                    continue;
+                }
+
+                return false;
+            }
         }
 
-        return $this;
+        return true;
     }
 
     /**
      * Process --except option.
      *
-     * @return HandlerMakeCommand
+     * @param ActionsBag $bag
+     * @return bool
      */
-    protected function processExceptOption(): self
+    protected function processExceptOption(ActionsBag $bag): bool
     {
         if ($except = (string) $this->option('except')) {
-            collect(explode(',', $except))
-                ->each(function (string $action) {
-                    $this->deleteActionIfExists(
-                        $this->getValidatedAndNormalizedActionName($action)
-                    );
-                });
+            foreach (explode(',', $except) as $action) {
+                if (($normalizedActionName = $this->getValidatedAndNormalizedActionName($action)) !== false) {
+                    $bag->deleteIfExists($normalizedActionName);
+
+                    continue;
+                }
+
+                return false;
+            }
         }
 
-        return $this;
+        return true;
     }
 
     /**
      * Process an --api option.
      *
-     * @return HandlerMakeCommand
+     * @param ActionsBag $bag
+     * @return true
      */
-    public function processApiOption(): self
+    protected function processApiOption(ActionsBag $bag): bool
     {
         if ($this->option('api')) {
-            collect(['edit', 'create'])
-                ->each(function (string $action) {
-                    $this->deleteActionIfExists($action);
-                });
+            foreach (['edit', 'create'] as $action) {
+                $bag->deleteIfExists($action);
+            }
         }
 
-        return $this;
-    }
-
-    /**
-     * Add an action to the actions collection if it doesn't already exist there.
-     *
-     * @param string $action
-     * @return void
-     */
-    public function addActionIfNotExists(string $action): void
-    {
-        if (! $this->actions->contains($action)) {
-            $this->actions->push($action);
-        }
-    }
-
-    /**
-     * Delete an action from the actions collection if it already exists there.
-     *
-     * @param string $action
-     */
-    public function deleteActionIfExists(string $action): void
-    {
-        $this->actions = $this->actions->reject(function (string $existingAction) use ($action, &$exists) {
-            return $existingAction === $action;
-        });
+        return true;
     }
 
     /**
      * Get validated and normalized action name.
      *
      * @param string $action
-     * @return string
+     * @return string|false
      */
-    protected function getValidatedAndNormalizedActionName(string $action): string
+    protected function getValidatedAndNormalizedActionName(string $action)
     {
-        if (! preg_match('/^\w+$/', $action)) {
-            $this->error('['.$action.'] is not a valid action name.');
-            exit;
+        if (preg_match('/^\w+$/', $action)) {
+            return snake_case($action);
         }
 
-        return snake_case($action);
+        $this->error('['.$action.'] is not a valid action name.');
+
+        return false;
     }
 
     /**
@@ -279,7 +270,7 @@ class HandlerMakeCommand extends GeneratorCommand
      *
      * @return null|string
      */
-    public function getNameInput()
+    public function getNameInput(): ?string
     {
         return $this->nameInput;
     }
@@ -289,7 +280,7 @@ class HandlerMakeCommand extends GeneratorCommand
      *
      * @return string
      */
-    protected function getStub()
+    protected function getStub(): string
     {
         return __DIR__.'/../../stubs/handler.stub';
     }
@@ -297,9 +288,9 @@ class HandlerMakeCommand extends GeneratorCommand
     /*
      * Get the class name of the base handler.
      *
-     * @return string
+     * @return string|boolean
      */
-    protected function getBaseHandlerClassName(): string
+    protected function getBaseHandlerClassName()
     {
         if (class_exists($base = config('handlers.base')))
         {
@@ -307,7 +298,8 @@ class HandlerMakeCommand extends GeneratorCommand
         }
 
         $this->error('The [' . $base . '] class specified as the base handler doesn\'t exist.');
-        exit;
+
+        return false;
     }
 
     /**
@@ -321,7 +313,7 @@ class HandlerMakeCommand extends GeneratorCommand
     {
         $stub = str_replace(
             ['DummyNamespace', 'DummyBaseHandlerNamespace'],
-            [$this->getNamespace($name), $this->getBaseHandlerClassName(), config('auth.providers.users.model')],
+            [$this->getNamespace($name), $this->getBaseHandlerClassName()],
             $stub
         );
 

@@ -3,6 +3,7 @@
 namespace Hivokas\LaravelHandlers\Tests;
 
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Artisan;
 use SplFileInfo;
 use Symfony\Component\Console\Exception\RuntimeException;
 
@@ -35,6 +36,17 @@ class HandlerMakeCommandTest extends AbstractTestCase
         $this->artisan('make:handler');
     }
 
+    public function test_invalid_name_specified()
+    {
+        $this->artisan('make:handler', [
+            'name' => 'ShowProfile%',
+        ]);
+
+        $this->assertDirectoryNotExists($this->app->path('Handlers'));
+
+        $this->assertEquals(Artisan::output(), 'Name can\'t contain any non-word characters.' . PHP_EOL);
+    }
+
     public function test_create_existent_handler_without_force_option()
     {
         $initialHandlerContent = str_random();
@@ -49,6 +61,8 @@ class HandlerMakeCommandTest extends AbstractTestCase
         ]);
 
         $this->assertEquals($initialHandlerContent, file_get_contents($filePath));
+
+        $this->assertEquals(Artisan::output(), 'ShowProfile handler already exists!' . PHP_EOL);
     }
 
     public function test_create_existent_handler_with_force_option()
@@ -90,6 +104,19 @@ class HandlerMakeCommandTest extends AbstractTestCase
         ]);
 
         $this->assertFileExists($filePath);
+    }
+
+    public function test_invalid_namespace_option()
+    {
+        $this->artisan('make:handler', [
+            'name' => 'ShowProfile',
+            '--namespace' => 'InvalidNamespace%',
+        ]);
+
+
+        $this->assertDirectoryNotExists($this->app->path('Handlers'));
+
+        $this->assertEquals(Artisan::output(), '[InvalidNamespace%] is not a valid namespace.' . PHP_EOL);
     }
 
     public function test_resource_option()
@@ -150,6 +177,18 @@ class HandlerMakeCommandTest extends AbstractTestCase
         $this->assertEquals(array_sort_recursive($expectedFiles), array_sort_recursive($actualFiles));
     }
 
+    public function test_invalid_actions_option()
+    {
+        $this->artisan('make:handler', [
+            'name' => 'Profile',
+            '--actions' => 'show,destroy%',
+        ]);
+
+        $this->assertDirectoryNotExists($this->app->path('Handlers'));
+
+        $this->assertEquals(Artisan::output(), '[destroy%] is not a valid action name.' . PHP_EOL);
+    }
+
     public function test_except_option()
     {
         $handlersPath = $this->app->path('Http/Handlers');
@@ -170,6 +209,19 @@ class HandlerMakeCommandTest extends AbstractTestCase
         $actualFiles = $this->getFileNamesByPath($handlersPath);
 
         $this->assertEquals(array_sort_recursive($expectedFiles), array_sort_recursive($actualFiles));
+    }
+
+    public function test_invalid_except_option()
+    {
+        $this->artisan('make:handler', [
+            'name' => 'Profile',
+            '--resource' => true,
+            '--except' => 'show,destroy%',
+        ]);
+
+        $this->assertDirectoryNotExists($this->app->path('Handlers'));
+
+        $this->assertEquals(Artisan::output(), '[destroy%] is not a valid action name.' . PHP_EOL);
     }
 
     public function test_proper_file_content_generation()
