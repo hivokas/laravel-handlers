@@ -252,6 +252,19 @@ class HandlerMakeCommandTest extends AbstractTestCase
         $this->assertEquals($generatedContent, $expectedContent);
     }
 
+    public function test_non_existent_base_class()
+    {
+        config([
+            'handlers.base' => 'Foo\\Bar\\Invalid\\ClassName',
+        ]);
+
+        $this->artisan('make:handler', [
+            'name' => 'ShowProfile',
+        ]);
+
+        $this->assertEquals(Artisan::output(), 'The [Foo\\Bar\\Invalid\\ClassName] class specified as the base handler doesn\'t exist.' . PHP_EOL);
+    }
+
     /**
      * Get handler file names by name and actions.
      *
