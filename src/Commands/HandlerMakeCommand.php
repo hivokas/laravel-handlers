@@ -2,9 +2,9 @@
 
 namespace Hivokas\LaravelHandlers\Commands;
 
-use Hivokas\LaravelHandlers\Support\ActionsBag;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Console\GeneratorCommand;
+use Hivokas\LaravelHandlers\Support\ActionsBag;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
@@ -74,10 +74,9 @@ class HandlerMakeCommand extends GeneratorCommand
             return false;
         }
 
-
         foreach ($classNames as $className) {
-            $this->nameInput = $finalNamespace . '\\' . $className;
-            $this->type = $className . ' handler';
+            $this->nameInput = $finalNamespace.'\\'.$className;
+            $this->type = $className.' handler';
 
             parent::handle();
         }
@@ -117,7 +116,7 @@ class HandlerMakeCommand extends GeneratorCommand
         $namespace = (string) $this->option('namespace');
 
         if (! $namespace) {
-            return null;
+            return;
         }
 
         $namespaceWithNormalizedSlashes = preg_replace('/[\/\\\]+/', '\\', $namespace);
@@ -292,12 +291,11 @@ class HandlerMakeCommand extends GeneratorCommand
      */
     protected function getBaseHandlerClassName()
     {
-        if (class_exists($base = config('handlers.base')))
-        {
+        if (class_exists($base = config('handlers.base'))) {
             return $base;
         }
 
-        $this->error('The [' . $base . '] class specified as the base handler doesn\'t exist.');
+        $this->error('The ['.$base.'] class specified as the base handler doesn\'t exist.');
 
         return false;
     }
