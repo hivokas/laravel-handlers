@@ -14,7 +14,9 @@ class HandlersServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        $this->publishes([
+            __DIR__.'/../../config/handlers.php' => config_path('handlers.php'),
+        ], 'config');
     }
 
     /**
@@ -24,6 +26,8 @@ class HandlersServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->mergeConfigFrom(__DIR__.'/../../config/handlers.php', 'handlers');
+
         $this->app->singleton('command.handler.make', HandlerMakeCommand::class);
 
         $this->commands([
