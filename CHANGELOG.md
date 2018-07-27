@@ -16,3 +16,6 @@ All notable changes to `laravel-handlers` will be documented in this file
 - added ability to specify base handler class in config;
 - general refactoring;
 - improved code coverage.
+
+## 0.3.1
+- fixed incorrect behaviour of `--force` flag with laravel/framework [v5.5.0].
