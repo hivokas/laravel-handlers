@@ -26,20 +26,6 @@ class HandlerMakeCommand extends GeneratorCommand
     protected $description = 'Handler generator.';
 
     /**
-     * The type of class being generated.
-     *
-     * @var string
-     */
-    protected $type = 'Handler';
-
-    /**
-     * The name input.
-     *
-     * @var string|null
-     */
-    protected $nameInput = null;
-
-    /**
      * HandlerMakeCommand constructor.
      *
      * @param Filesystem $files
@@ -69,10 +55,25 @@ class HandlerMakeCommand extends GeneratorCommand
             $finalNamespace = $this->getFinalNamespace();
 
             foreach ($classNames as $className) {
-                $this->nameInput = $finalNamespace.'\\'.$className;
-                $this->type = $className.' handler';
+                $fullClassName = $finalNamespace.'\\'.$className;
 
-                parent::handle();
+                $type = $className.' handler';
+
+                $path = $this->getPath($fullClassName);
+
+                if ((! $this->hasOption('force') ||
+                        ! $this->option('force')) &&
+                    $this->alreadyExists($fullClassName)) {
+                    $this->error($type.' already exists!');
+
+                    continue;
+                }
+
+                $this->makeDirectory($path);
+
+                $this->files->put($path, $this->buildClass($fullClassName));
+
+                $this->info($type.' created successfully.');
             }
         } catch (CommandException $exception) {
             $this->error($exception->getMessage());
