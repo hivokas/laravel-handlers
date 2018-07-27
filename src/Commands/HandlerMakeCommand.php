@@ -247,16 +247,6 @@ class HandlerMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Get the name input.
-     *
-     * @return null|string
-     */
-    public function getNameInput(): ?string
-    {
-        return $this->nameInput;
-    }
-
-    /**
      * Get the stub file for the generator.
      *
      * @return string
