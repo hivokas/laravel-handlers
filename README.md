@@ -24,6 +24,32 @@ composer require hivokas/laravel-handlers
 
 The package will automatically register itself.
 
+You can publish the config file with:
+
+```bash
+php artisan vendor:publish --provider="Hivokas\LaravelHandlers\Providers\HandlersServiceProvider" --tag="config"
+```
+
+This is the contents of the published config file:
+
+```php
+return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Base Handler Class
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify which class will be used as the base class
+    | for all generated handlers.
+    |
+    */
+
+    'base' => Hivokas\LaravelHandlers\Handler::class,
+
+];
+```
+
 ## Creation of request handlers
 
 ![Showcase](showcase.svg)
