@@ -1,5 +1,12 @@
 # Laravel Handlers
 
+[![Latest Version](https://img.shields.io/github/release/hivokas/laravel-handlers.svg?style=flat-square)](https://github.com/hivokas/laravel-handlers/releases)
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
+[![Build Status](https://img.shields.io/travis/hivokas/laravel-handlers/master.svg?style=flat-square)](https://travis-ci.org/hivokas/laravel-handlers)
+[![StyleCI](https://styleci.io/repos/141638370/shield)](https://styleci.io/repos/141638370)
+[![Quality Score](https://img.shields.io/scrutinizer/g/hivokas/laravel-handlers.svg?style=flat-square)](https://scrutinizer-ci.com/g/hivokas/laravel-handlers)
+[![Coverage Status](https://img.shields.io/scrutinizer/coverage/g/hivokas/laravel-handlers.svg?style=flat-square)](https://scrutinizer-ci.com/g/hivokas/laravel-handlers/code-structure)
+
 > Goodbye controllers, hello request handlers!
 
 This package adds a handy way of creating the request handlers.
